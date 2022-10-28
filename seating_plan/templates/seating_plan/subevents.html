@@ -1,0 +1,98 @@
+{% extends "pretixcontrol/event/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load urlreplace %}
+{% block title %}{% trans "Event series" context "subevent" %}{% endblock %}
+{% block content %}
+    <h1>{% trans "Dates" context "subevent" %}</h1>
+    {% if subevents|length == 0 and not filter_form.filtered %}
+        <div class="empty-collection">
+            <p>
+                {% blocktrans trimmed %}
+                    You haven't created any dates for this event series yet.
+                {% endblocktrans %}
+            </p>
+
+            <a href="{% url "control:event.subevents.add" organizer=request.event.organizer.slug event=request.event.slug %}"
+                    class="btn btn-primary btn-lg"><i class="fa fa-plus"></i>
+                {% trans "Create a new date" context "subevent" %}</a>
+            <a href="{% url "control:event.subevents.bulk" organizer=request.event.organizer.slug event=request.event.slug %}"
+                    class="btn btn-primary btn-lg"><i class="fa fa-plus"></i>
+                {% trans "Create many new dates" context "subevent" %}</a>
+        </div>
+    {% else %}
+ 
+  
+
+            <div class="table-responsive">
+                <table class="table table-hover table-quotas">
+                    <thead>
+                    <tr>
+                        <th>
+                            {% if "can_change_event_settings" in request.eventpermset %}
+                                <label aria-label="{% trans "select all rows for batch-operation" %}" class="batch-select-label"><input type="checkbox" data-toggle-table/></label>
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% trans "Name" %}
+                        </th>
+                        <th>
+                            {% trans "Begin" %}
+                            <a href="?{% url_replace request 'filter-ordering' '-date_from' %}"><i class="fa fa-caret-down"></i></a>
+                            <a href="?{% url_replace request 'filter-ordering' 'date_from' %}"><i class="fa fa-caret-up"></i></a>
+                        </th>
+                        <th>
+                            {% trans "Seating Plan" %}
+                        </th>
+                        <th>
+                            {% trans "Status" %}
+                            <a href="?{% url_replace request 'filter-ordering' '-active' %}"><i class="fa fa-caret-down"></i></a>
+                            <a href="?{% url_replace request 'filter-ordering' 'active' %}"><i class="fa fa-caret-up"></i></a>
+                        </th>
+                        <th></th>
+                    </tr>
+                  
+                    </thead>
+                    <tbody>
+                    {% for s in subevents %}
+                        <tr>
+                            <td>
+                                {% if "can_change_event_settings" in request.eventpermset %}
+                                    <label aria-label="{% trans "select row for batch-operation" %}" class="batch-select-label"><input type="checkbox" name="subevent" class="batch-select-checkbox" value="{{ s.pk }}"/></label>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong><a href="{% url "control:event.subevent" organizer=request.event.organizer.slug event=request.event.slug subevent=s.id %}?returnto={{ request.GET.urlencode|urlencode }}">
+                                    {{ s.name }}</a></strong>
+                            </td>
+                            <td>
+                                {{ s.get_date_from_display }}<br>
+                                <span class="text-muted">
+                                   {{ s.date_from|date:"l" }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong><a href="{% url "control:event.seating.display" organizer=request.event.organizer.slug event=request.event.slug %}?subevent={{s.id}}">
+                                    seatingplan</a></strong>
+                            </td>
+                            <td>
+                                {% if not s.active %}
+                                    <span class="label label-danger">{% trans "Disabled" %}</span>
+                                {% elif s.presale_has_ended %}
+                                    <span class="label label-warning">{% trans "Presale over" %}</span>
+                                {% elif not s.presale_is_running %}
+                                    <span class="label label-warning">{% trans "Presale not started" %}</span>
+                                {% else %}
+                                    <span class="label label-success">{% trans "On sale" %}</span>
+                                {% endif %}
+                            </td>
+                         
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+ 
+        {% include "pretixcontrol/pagination.html" %}
+    {% endif %}
+{% endblock %}

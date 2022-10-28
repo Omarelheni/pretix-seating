@@ -1,0 +1,5 @@
+recursive-include seating_plan/static *
+recursive-include seating_plan/templates *
+recursive-include seating_plan/locale *
+include LICENSE
+exclude .gitlab-ci.yml

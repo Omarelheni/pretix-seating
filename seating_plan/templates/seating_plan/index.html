@@ -1,0 +1,82 @@
+{% extends "pretixcontrol/event/base.html" %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load urlreplace %}
+{% load money %}
+{% block title %}{% trans "Seating" %}{% endblock %}
+{% block content %}
+    <h1>{% trans "Seating" %}</h1>
+    <fieldset>
+        <legend>Plan Editor</legend>
+        
+            <div class="panel panel-default ticketoutput-panel">
+                <div class="panel-heading">
+                </div>
+                <div class="panel-body">               
+<p>
+    you can create your own seating plans to use with pretix quickly and conveniently. Inside pretix, you get full control over mapping seats to pricing categories for every event. Of course, you can also block seats from being sold, e.g. when you sell some rows through other channels.
+</p>
+<p>
+<a class="btn btn-primary btn-lg" target="_blank" href="https://seat.evey.live/">
+<span class="fa fa-paint-brush"></span>
+Open Plan Editor
+</a>
+</p>
+
+                    
+                </div>
+            </div>
+        
+    </fieldset>
+    <fieldset>
+        
+        <legend>Plan Uploader</legend>
+    <p>
+        {% blocktrans trimmed %}
+            After editing you can dump your downloaded plan in this section  .
+        {% endblocktrans %}
+    </p>
+    {% if has_subevents %}
+
+    {% for subevent in subevents %}
+
+    <div class = "panel panel-default" style="padding : 10px 15px;">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {{ subevent}}
+        </h3>
+    </div>
+    <form class="form-inline"
+    enctype="multipart/form-data"
+    action="{% url "plugins:seating_plan:event.seating.upload"  event=request.event.slug organizer=request.event.organizer.slug %}?subevent={{ subevent.id}}"
+    method="post">
+    {% csrf_token %}
+<div     style='padding-left: 30px'>
+    <p class="input-group" >
+    {{ form.as_p }}
+    <span class="input-group-btn">
+            <button class="btn btn-primary" type="submit">{% trans "Go!" %}</button>
+        </span>
+</p>
+</div>
+</form>   
+</div> 
+    {% endfor %}
+    {% else %}
+        <form class="form-inline"
+        enctype="multipart/form-data"
+        action="{% url "plugins:seating_plan:event.seating.upload" event=request.event.slug organizer=request.event.organizer.slug %}"
+        method="post">
+        {% csrf_token %}
+
+    <p class="input-group">
+        {{ form.as_p }}
+        <span class="input-group-btn">
+                <button class="btn btn-primary" type="submit">{% trans "Save" %}</button>
+            </span>
+    </p>
+</form>    
+{% endif %}   
+    </div>
+</fieldset>
+{% endblock %}

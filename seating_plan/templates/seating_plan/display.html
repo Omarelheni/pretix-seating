@@ -1,0 +1,72 @@
+{% extends "pretixcontrol/event/base.html" %}
+{% load hierarkey_form %}
+{% load formset_tags %}
+
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load urlreplace %}
+{% load money %}
+{% block title %}{% trans "Seating" %}{% endblock %}
+{% block content %}
+<div class="tabbed-form">
+    <fieldset>
+        <legend>{% trans "Display" %}</legend>
+        <br>
+
+    <h1>{% trans "Seating plan" %}</h1>
+    <p>
+        {% blocktrans trimmed %}
+        You are welcome to use pretix for reserved seating events. 
+        Ticket buyers can choose their own seats on an interactive seating plan.
+        you can use this  section to upload a seating plan
+
+
+
+        {% endblocktrans %}
+    </p>
+<br>
+<br>
+<br>
+    <canvas id="myCanvas" ></canvas>
+</fieldset>
+
+
+
+<fieldset class="tab-pane active">
+    <legend>{% trans "Modfiy" %}</legend>
+    <form method="post" >
+        {% csrf_token %}
+        <div class="form-group">
+
+{% for categorie , items in categories.items  %}
+    <label class="col-md-3 control-label">
+        {{ categorie }}
+    </label>
+
+    <div class="col-md-9">
+        <div >
+            {% for item in items %}
+            <div class="checkbox">
+                <label for="{{ item }}">
+                    <input type="checkbox" class="thisisacheck" name="{{ item.0 }}_____{{ categorie}}" data-check="{{ item.1 }}" title="" id="{{ item.0 }}_{{ categorie}}" ng-checked="true" >
+                        {{item.0}}
+                        </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endfor %}
+<input type="submit">
+
+</div>
+</form>
+<input type="hidden" id="url_data" value="{{url_data}}">
+
+</fieldset>
+</div>     
+    <script type="text/javascript" src="{% static "seating_plan/control/display_seats.js?rand=302883" %}"></script>
+
+
+{% endblock %}
